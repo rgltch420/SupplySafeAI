@@ -1,0 +1,53 @@
+<div class="page">
+  <header>
+    <h1>Incidents</h1>
+    <p>Open disruption cases and contingency status.</p>
+  </header>
+
+  @for (inc of incidents; track inc.id) {
+    <article class="glass card">
+      <div class="top">
+        <div>
+          <span class="mono cyan">{{ inc.id }}</span>
+          <h2>{{ inc.title }}</h2>
+        </div>
+        <div class="badges">
+          <app-status-badge [label]="inc.severity" />
+          <app-status-badge [label]="inc.status" />
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div><span class="label">Risk</span><span class="mono">{{ inc.riskScore }}</span></div>
+        <div><span class="label">Units</span><span class="mono">{{ inc.affectedUnits | number }}</span></div>
+        <div><span class="label">Loss</span><span class="mono">{{ inc.estimatedLoss | currency: 'USD':'symbol':'1.0-0' }}</span></div>
+        <div><span class="label">Shipment</span><span class="mono">{{ inc.shipmentId }}</span></div>
+      </div>
+
+      <p class="meta">Opened {{ inc.createdAt | date: 'medium' }}</p>
+
+      <div class="cols">
+        <div>
+          <h3>Recommendations</h3>
+          <ul>
+            @for (r of inc.recommendations; track r) {
+              <li>{{ r }}</li>
+            }
+          </ul>
+        </div>
+        <div>
+          <h3>Actions executed</h3>
+          @if (!inc.actionsExecuted.length) {
+            <p class="empty">None yet — run EXECUTE from Mission Control.</p>
+          } @else {
+            <ul>
+              @for (a of inc.actionsExecuted; track a) {
+                <li>{{ a }}</li>
+              }
+            </ul>
+          }
+        </div>
+      </div>
+    </article>
+  }
+</div>

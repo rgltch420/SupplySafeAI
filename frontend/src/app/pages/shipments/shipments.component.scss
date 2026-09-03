@@ -1,0 +1,44 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+header p {
+  margin: 0.35rem 0 0;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
+.table-card {
+  padding: 0.85rem;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+th,
+td {
+  padding: 0.6rem 0.45rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  text-align: left;
+}
+
+th {
+  color: var(--muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+}

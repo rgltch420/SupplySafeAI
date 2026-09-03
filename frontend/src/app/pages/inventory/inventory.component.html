@@ -1,0 +1,26 @@
+<div class="page">
+  <header>
+    <h1>Inventory</h1>
+    <p>Coverage days vs reorder points across critical SKUs.</p>
+  </header>
+
+  <div class="grid">
+    @for (item of items; track item.id) {
+      <article class="glass card">
+        <div class="top">
+          <div>
+            <h2>{{ item.product }}</h2>
+            <span class="mono muted">{{ item.id }}</span>
+          </div>
+          <app-status-badge [label]="item.status" />
+        </div>
+        <div class="metrics">
+          <div><span class="label">Qty</span><span class="mono">{{ item.quantity | number }}</span></div>
+          <div><span class="label">Daily</span><span class="mono">{{ item.dailyConsumption | number: '1.0-1' }}</span></div>
+          <div><span class="label">Coverage</span><span class="mono">{{ item.coverageDays }}d</span></div>
+          <div><span class="label">Reorder</span><span class="mono">{{ item.reorderPoint | number }}</span></div>
+        </div>
+      </article>
+    }
+  </div>
+</div>

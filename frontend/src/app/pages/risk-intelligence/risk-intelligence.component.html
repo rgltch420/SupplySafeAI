@@ -1,0 +1,28 @@
+<div class="page">
+  <header>
+    <h1>Risk Intelligence</h1>
+    <p>External and corridor signals feeding the prediction loop.</p>
+  </header>
+
+  <div class="list">
+    @for (risk of risks; track risk.id) {
+      <article class="glass card">
+        <div class="top">
+          <div>
+            <span class="mono id">{{ risk.id }}</span>
+            <h2>{{ risk.title }}</h2>
+          </div>
+          <div class="badges">
+            <app-status-badge [label]="risk.type" />
+            <app-status-badge [label]="risk.severity" [value]="risk.score" [showValue]="true" />
+          </div>
+        </div>
+        <p>{{ risk.description }}</p>
+        <div class="meta">
+          <span class="mono">Detected {{ risk.detectedAt | date: 'MMM d, HH:mm' }}</span>
+          <span>Affects: {{ risk.affectedShipments.join(', ') }}</span>
+        </div>
+      </article>
+    }
+  </div>
+</div>

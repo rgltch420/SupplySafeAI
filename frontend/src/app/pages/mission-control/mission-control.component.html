@@ -1,0 +1,256 @@
+<div class="mc">
+  @if (loading && !dashboard) {
+    <div class="loading glass">Loading mission board…</div>
+  } @else {
+    <section class="kpis">
+      <article class="kpi glass">
+        <span class="label">Cargo Monitored</span>
+        <span class="value mono">{{ dashboard?.cargoMonitored | number }}</span>
+      </article>
+      <article class="kpi glass threat-kpi">
+        <span class="label">Risk Score</span>
+        <span class="value mono danger">{{ dashboard?.riskScore ?? 87 }}</span>
+      </article>
+      <article class="kpi glass">
+        <span class="label">Active Incidents</span>
+        <span class="value mono">{{ dashboard?.activeIncidents }}</span>
+      </article>
+      <article class="kpi glass">
+        <span class="label">Supply Reliability</span>
+        <span class="value mono ok">{{ dashboard?.supplyReliability }}%</span>
+      </article>
+      <article class="kpi glass">
+        <span class="label">Shipments at Risk</span>
+        <span class="value mono warn">{{ dashboard?.shipmentsAtRisk }}</span>
+      </article>
+      <article class="kpi glass">
+        <span class="label">Inventory at Risk</span>
+        <span class="value mono warn">{{ dashboard?.inventoryAtRisk }}</span>
+      </article>
+    </section>
+
+    <section class="hero-grid">
+      <article class="threat glass">
+        <div class="threat-head">
+          <div>
+            <span class="info-badge">Supply chain resilience · live corridor</span>
+            <p class="eyebrow">ACTIVE THREAT</p>
+            <h1>
+              {{ critical?.product ?? 'Essential Rice' }} ·
+              <span class="accent">{{ critical?.id ?? 'SHP-2048' }}</span>
+            </h1>
+            <p class="route-line">{{ critical?.route }}</p>
+          </div>
+          <app-status-badge [label]="critical?.status ?? 'Delayed'" />
+        </div>
+
+        <div class="threat-metrics">
+          <div>
+            <span class="label">Risk</span>
+            <span class="big mono danger">{{ analysis?.riskScore ?? critical?.riskScore ?? 87 }}</span>
+          </div>
+          <div>
+            <span class="label">Delay</span>
+            <span class="big mono warn">+{{ analysis?.delayDays ?? critical?.delayDays ?? 6 }}d</span>
+          </div>
+          <div>
+            <span class="label">Coverage</span>
+            <span class="big mono">{{ analysis?.inventoryCoverageDays ?? 7.1 }}d</span>
+          </div>
+          <div>
+            <span class="label">Confidence</span>
+            <span class="big mono">{{ analysis?.confidence ?? '—' }}{{ analysis ? '%' : '' }}</span>
+          </div>
+        </div>
+
+        <div class="impact-strip">
+          <div>
+            <span class="label">Projected shortage</span>
+            <span class="mono danger">{{ impactUnits | number }} units</span>
+          </div>
+          <div>
+            <span class="label">Estimated loss</span>
+            <span class="mono danger">{{ impactLoss | currency: 'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div>
+            <span class="label">Signal</span>
+            <span class="mono cyan">RSK-WX-01 · Weather · 92</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="actions glass">
+        <p class="eyebrow">ACTION CENTER</p>
+        <h2>Respond <span class="accent">before</span> stockout</h2>
+        <p class="hint">Pitch path: Simulate → Risk 87 → 13,200 units → AI rec → Execute → Email → $84,600 avoided</p>
+
+        <div class="cta-row">
+          <button
+            type="button"
+            class="btn primary"
+            [disabled]="busy"
+            (click)="simulateDisruption()"
+          >
+            SIMULATE DISRUPTION →
+          </button>
+          <button
+            type="button"
+            class="btn execute"
+            [disabled]="busy || !analysis"
+            (click)="executeContingency()"
+          >
+            EXECUTE CONTINGENCY PLAN
+          </button>
+        </div>
+
+        @if (lossAvoidedVisible && executeResult) {
+          <div class="loss-banner animate-in">
+            <span class="mono">{{ executeResult.estimatedCostAvoided | currency: 'USD':'symbol':'1.0-0' }}</span>
+            <span>LOSS AVOIDED</span>
+            <app-status-badge [label]="executeResult.status" />
+          </div>
+        }
+
+        @if (emailSent) {
+          <div class="email-chip animate-in">
+            Email → Operations / Procurement · SUPPLYSAFE - Critical Supply Chain Risk
+          </div>
+        }
+      </article>
+    </section>
+
+    <section class="mid-grid">
+      <article class="glass panel">
+        <div class="panel-head">
+          <h3>Shipments</h3>
+          <span class="mono muted">live board</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Route</th>
+                <th>Status</th>
+                <th>Risk</th>
+                <th>ETA</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of shipments; track s.id) {
+                <tr [ngClass]="{ critical: s.id === 'SHP-2048' }">
+                  <td class="mono">{{ s.id }}</td>
+                  <td>{{ s.product }}</td>
+                  <td class="muted">{{ s.route }}</td>
+                  <td><app-status-badge [label]="s.status" /></td>
+                  <td>
+                    <app-status-badge [label]="s.riskLevel" [value]="s.riskScore" [showValue]="true" />
+                  </td>
+                  <td class="mono">{{ s.eta | date: 'MMM d' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="glass panel">
+        <div class="panel-head">
+          <h3>Inventory coverage</h3>
+        </div>
+        <ul class="inv-list">
+          @for (item of inventory; track item.id) {
+            <li>
+              <div>
+                <strong>{{ item.product }}</strong>
+                <span class="mono muted">{{ item.id }}</span>
+              </div>
+              <div class="inv-right">
+                <span class="mono">{{ item.coverageDays }}d</span>
+                <app-status-badge [label]="item.status" />
+              </div>
+              <div class="bar">
+                <span [style.width.%]="Math.min(item.coverageDays * 3.2, 100)" [ngClass]="item.status.toLowerCase()"></span>
+              </div>
+            </li>
+          }
+        </ul>
+      </article>
+    </section>
+
+    <section class="lower-grid">
+      <article class="glass panel">
+        <div class="panel-head">
+          <h3>Route visualization</h3>
+          <span class="mono muted">no maps · corridor view</span>
+        </div>
+        <div class="route-viz">
+          @for (stop of routeStops; track stop; let i = $index; let last = $last) {
+            <div class="stop" [ngClass]="{ hot: i === 1 || last }">
+              <div class="dot"></div>
+              <span>{{ stop }}</span>
+            </div>
+            @if (!last) {
+              <div class="lane" [ngClass]="{ storm: true }"></div>
+            }
+          }
+        </div>
+        <p class="route-note">Caribbean storm corridor degrading Shanghai → Cartagena feeder. ETA slip +6 days.</p>
+      </article>
+
+      <article class="glass panel ai-panel">
+        <div class="panel-head">
+          <h3>AI analysis</h3>
+          @if (analysis) {
+            <app-status-badge [label]="analysis.severity" />
+          }
+        </div>
+        @if (!analysis) {
+          <p class="empty">Run <strong>SIMULATE DISRUPTION</strong> to analyze SHP-2048.</p>
+        } @else {
+          <div class="ai-grid">
+            <div><span class="label">Risk</span><span class="mono danger">{{ analysis.riskScore }}</span></div>
+            <div><span class="label">Shortage</span><span class="mono">{{ analysis.projectedShortageUnits | number }}</span></div>
+            <div><span class="label">Impact</span><span class="mono">{{ analysis.estimatedFinancialImpact | currency: 'USD':'symbol':'1.0-0' }}</span></div>
+            <div><span class="label">Stockout</span><span class="mono">{{ analysis.predictedStockout ? 'YES' : 'NO' }}</span></div>
+          </div>
+          <ul class="recs">
+            @for (rec of analysis.recommendations; track rec) {
+              <li>{{ rec }}</li>
+            }
+          </ul>
+        }
+      </article>
+
+      <article class="glass panel">
+        <div class="panel-head">
+          <h3>Execution ticks</h3>
+        </div>
+        @if (!tickedActions.length && !executeResult) {
+          <p class="empty">Execute contingency to animate actions.</p>
+        } @else {
+          <ul class="ticks">
+            @for (action of tickedActions; track action) {
+              <li class="animate-in"><span class="check">✓</span> {{ action }}</li>
+            }
+          </ul>
+        }
+      </article>
+
+      <article class="glass panel">
+        <div class="panel-head">
+          <h3>Timeline</h3>
+        </div>
+        <ul class="timeline">
+          @for (ev of timeline; track ev.time + ev.label) {
+            <li [ngClass]="ev.tone">
+              <span class="mono">{{ ev.time }}</span>
+              <span>{{ ev.label }}</span>
+            </li>
+          }
+        </ul>
+      </article>
+    </section>
+  }
+</div>

@@ -1,0 +1,107 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+header p {
+  margin: 0.35rem 0 0;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
+.card {
+  padding: 1.1rem;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cyan {
+  color: var(--orange);
+  font-size: 0.72rem;
+}
+
+h2 {
+  margin: 0.3rem 0 0;
+  font-size: 1.05rem;
+  font-family: var(--font-display);
+}
+
+.badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.85rem;
+}
+
+h3 {
+  margin: 0 0 0.45rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+ul {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.82rem;
+  color: #d5deec;
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 800px) {
+  .metrics,
+  .cols {
+    grid-template-columns: 1fr 1fr;
+  }
+}

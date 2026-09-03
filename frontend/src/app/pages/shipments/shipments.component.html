@@ -1,0 +1,39 @@
+<div class="page">
+  <header>
+    <h1>Shipments</h1>
+    <p>Active cargo lanes monitored by SupplySafe AI.</p>
+  </header>
+
+  <div class="glass table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Product</th>
+          <th>Origin</th>
+          <th>Destination</th>
+          <th>Status</th>
+          <th>Risk</th>
+          <th>Units</th>
+          <th>Value</th>
+          <th>ETA</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of shipments; track s.id) {
+          <tr>
+            <td class="mono">{{ s.id }}</td>
+            <td>{{ s.product }}</td>
+            <td>{{ s.origin }}</td>
+            <td>{{ s.destination }}</td>
+            <td><app-status-badge [label]="s.status" /></td>
+            <td><app-status-badge [label]="s.riskLevel" [value]="s.riskScore" [showValue]="true" /></td>
+            <td class="mono">{{ s.units | number }}</td>
+            <td class="mono">{{ s.value | currency: 'USD':'symbol':'1.0-0' }}</td>
+            <td class="mono">{{ s.eta | date: 'MMM d, y' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

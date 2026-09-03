@@ -1,0 +1,81 @@
+:root {
+  --bg: #080c14;
+  --bg-deep: #0b0f19;
+  --bg-elevated: rgba(12, 18, 32, 0.72);
+  --border: rgba(255, 255, 255, 0.12);
+  --orange: #f37021;
+  --orange-hot: #ff8a3d;
+  --orange-deep: #c45512;
+  --cyan: #f37021;
+  --green: #3dd68c;
+  --amber: #f5a524;
+  --red: #ff5c5c;
+  --muted: #a8b0c0;
+  --text: #ffffff;
+  --text-soft: #d1d5db;
+  --font-display: 'Montserrat', 'Segoe UI', sans-serif;
+  --font-body: 'Montserrat', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --radius: 10px;
+  --radius-pill: 999px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(105deg, rgba(8, 12, 20, 0.92) 0%, rgba(8, 12, 20, 0.78) 42%, rgba(8, 12, 20, 0.55) 100%),
+    linear-gradient(180deg, rgba(8, 12, 20, 0.35) 0%, rgba(8, 12, 20, 0.85) 100%),
+    url('/port-hero.jpg');
+  background-size: cover;
+  background-position: center right;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+.glass {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(16px) saturate(1.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.accent {
+  color: var(--orange);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(243, 112, 33, 0.35);
+  border-radius: 999px;
+}

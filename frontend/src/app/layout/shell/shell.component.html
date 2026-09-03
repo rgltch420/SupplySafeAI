@@ -1,0 +1,52 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <img class="mark" src="/logo.png" alt="SupplySafe AI" width="40" height="40" />
+      <div>
+        <div class="brand-name">SUPPLYSAFE</div>
+        <div class="brand-sub">AI</div>
+      </div>
+    </div>
+
+    <p class="tagline">Don't wait for the supply chain to break. Act before it does.</p>
+
+    <nav>
+      @for (item of nav; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active">
+          <span class="nav-label">{{ item.label }}</span>
+          <span class="nav-hint">{{ item.hint }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="pipeline">
+      <span>DETECT</span>
+      <span>PREDICT</span>
+      <span>ANALYZE</span>
+      <span>RECOMMEND</span>
+      <span>ACT</span>
+      <span>NOTIFY</span>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="left">
+        <span class="product">SUPPLYSAFE <span class="accent">AI</span></span>
+        <span class="sep">·</span>
+        <span class="status" [ngClass]="{ mock: api.usingMocks() }">
+          {{ api.usingMocks() ? 'MOCK MODE · API OFFLINE' : 'SYSTEM OPERATIONAL' }}
+        </span>
+        <span class="api-url mono">{{ api.apiBaseUrl }}</span>
+      </div>
+      <div class="right-group">
+        <span class="right mono">{{ title$ | async }}</span>
+        <a class="cta-pill" routerLink="/mission-control">Mission Control</a>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

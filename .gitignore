@@ -6,6 +6,18 @@ obj/
 .vs/
 *.swp
 
+## Node / Angular
+node_modules/
+.angular/
+dist/
+frontend/dist/
+frontend/node_modules/
+frontend/.angular/
+
+## IDE
+.idea/
+*.iml
+
 ## Secrets / local
 .env
 *.pfx
