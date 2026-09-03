@@ -27,9 +27,13 @@ public class EmailNotificationService : IEmailNotificationService
         SendEmailRequest request,
         CancellationToken cancellationToken = default)
     {
+        var defaultRecipient = Environment.GetEnvironmentVariable("SUPPLYSAFE_NOTIFY_EMAIL")
+                               ?? _configuration["Demo:OperationsEmail"]
+                               ?? "operations@supplysafe.demo";
+
         var messageId = _store.NextMessageId();
         var recipient = string.IsNullOrWhiteSpace(request.Recipient)
-            ? "operations@supplysafe.demo"
+            ? defaultRecipient
             : request.Recipient.Trim();
         var subject = string.IsNullOrWhiteSpace(request.Subject)
             ? "SUPPLYSAFE - Critical Supply Chain Risk"
@@ -131,7 +135,9 @@ public class EmailNotificationService : IEmailNotificationService
 
         return SendAsync(new SendEmailRequest
         {
-            Recipient = "operations@supplysafe.demo",
+            Recipient = Environment.GetEnvironmentVariable("SUPPLYSAFE_NOTIFY_EMAIL")
+                        ?? _configuration["Demo:OperationsEmail"]
+                        ?? "operations@supplysafe.demo",
             Subject = "🚨 SUPPLYSAFE - Critical Supply Chain Risk",
             Body = body,
             IncidentId = incident.Id

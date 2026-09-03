@@ -40,6 +40,7 @@ builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>(
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<RiskAnalysisService>();
 builder.Services.AddScoped<IncidentService>();
+builder.Services.AddScoped<OrderWorkflowService>();
 
 builder.Services.AddHttpClient("xai", client =>
 {
