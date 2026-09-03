@@ -37,6 +37,7 @@ builder.Services.AddSingleton<InMemoryStore>();
 builder.Services.AddSingleton<ISupplyRiskEngine, SupplyRiskEngine>();
 builder.Services.AddScoped<IAiRiskAnalyzer, GrokRiskAnalyzer>();
 builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+builder.Services.AddScoped<ITrmFxService, SupplySafe.Api.Infrastructure.Fx.TrmFxService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<RiskAnalysisService>();
 builder.Services.AddScoped<IncidentService>();
@@ -46,6 +47,12 @@ builder.Services.AddHttpClient("xai", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["XAI:BaseUrl"] ?? "https://api.x.ai");
     client.Timeout = TimeSpan.FromSeconds(3);
+});
+
+builder.Services.AddHttpClient("trm", client =>
+{
+    client.BaseAddress = new Uri("https://www.datos.gov.co/");
+    client.Timeout = TimeSpan.FromSeconds(2);
 });
 
 builder.Services.AddProblemDetails();

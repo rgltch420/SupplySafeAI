@@ -198,6 +198,16 @@ public class OrderWorkflowService
             order.Timeline.Add("[T+process] Order completed without contingency");
         }
 
+        var impactUsd = analysis?.EstimatedFinancialImpact;
+        var impactCop = analysis?.EstimatedFinancialImpactCop;
+        var trm = analysis?.TrmUsdCop;
+
+        if (impactUsd is > 0 && trm is > 0)
+        {
+            order.Timeline.Add(
+                $"[T+process] FX/TRM applied — impact ${impactUsd:N0} USD ≈ ${impactCop:N0} COP (TRM {trm:N2})");
+        }
+
         var emailBody =
             $"""
             SUPPLYSAFE — ORDER WORKFLOW UPDATE
@@ -213,9 +223,11 @@ public class OrderWorkflowService
             Risk score: {riskScore}/100
             Status: {order.Status}
             Incident: {order.LinkedIncidentId ?? "n/a"}
+            Estimated impact: {(impactUsd is null ? "n/a" : $"${impactUsd:N0} USD")} / {(impactCop is null ? "n/a" : $"${impactCop:N0} COP")}
+            TRM USD/COP: {(trm is null ? "n/a" : $"{trm:N2}")}
 
             Timeline:
-            {string.Join('\n', order.Timeline.TakeLast(6))}
+            {string.Join('\n', order.Timeline.TakeLast(8))}
 
             — SupplySafe AI Operations Bot
             """;
@@ -251,6 +263,9 @@ public class OrderWorkflowService
             LinkedShipmentId = order.LinkedShipmentId,
             LinkedIncidentId = order.LinkedIncidentId,
             RiskScore = riskScore,
+            EstimatedImpactUsd = impactUsd,
+            EstimatedImpactCop = impactCop,
+            TrmUsdCop = trm,
             NotificationSent = email.Success,
             NotificationRecipient = notifyTo,
             Timeline = [.. order.Timeline],

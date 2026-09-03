@@ -7,6 +7,9 @@ public class ProcessOrderResultDto
     public string? LinkedShipmentId { get; set; }
     public string? LinkedIncidentId { get; set; }
     public int? RiskScore { get; set; }
+    public decimal? EstimatedImpactUsd { get; set; }
+    public decimal? EstimatedImpactCop { get; set; }
+    public decimal? TrmUsdCop { get; set; }
     public bool NotificationSent { get; set; }
     public string NotificationRecipient { get; set; } = string.Empty;
     public List<string> Timeline { get; set; } = [];

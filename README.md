@@ -92,6 +92,7 @@ JSON en **camelCase**. Enums como string (`"Critical"`, `"Delayed"`, etc.).
 | GET | `/api/orders/{id}` | Detalle de orden |
 | POST | `/api/orders/from-email` | Simula llegada de orden por correo |
 | POST | `/api/orders/{id}/process` | Procesa orden (link → risk → notify) |
+| GET | `/api/fx/trm` | TRM USD/COP + refs EUR/CNY |
 
 Demo seed: shipment `SHP-2048`, incidente `INC-2048`, orden `ORD-3000`, mail `MAIL-001`.
 
