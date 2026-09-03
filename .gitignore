@@ -1,0 +1,15 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
+
+## Secrets / local
+.env
+*.pfx
+
+## OS
+.DS_Store
+Thumbs.db
