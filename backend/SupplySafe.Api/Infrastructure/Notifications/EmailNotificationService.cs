@@ -32,9 +32,7 @@ public class EmailNotificationService : IEmailNotificationService
                                ?? "operations@supplysafe.demo";
 
         var messageId = _store.NextMessageId();
-        var recipient = string.IsNullOrWhiteSpace(request.Recipient)
-            ? defaultRecipient
-            : request.Recipient.Trim();
+        var recipient = ResolveRecipient(request.Recipient, defaultRecipient);
         var subject = string.IsNullOrWhiteSpace(request.Subject)
             ? "SUPPLYSAFE - Critical Supply Chain Risk"
             : request.Subject.Trim();
@@ -43,17 +41,38 @@ public class EmailNotificationService : IEmailNotificationService
             : request.Body;
 
         var sentViaSmtp = false;
-        var host = _configuration["Smtp:Host"];
-        if (!string.IsNullOrWhiteSpace(host))
+        // Prefer env so App Password never needs to live in committed files
+        var host = Environment.GetEnvironmentVariable("Smtp__Host")
+                   ?? _configuration["Smtp:Host"];
+        var smtpUser = Environment.GetEnvironmentVariable("Smtp__Username")
+                       ?? _configuration["Smtp:Username"];
+        var smtpPass = Environment.GetEnvironmentVariable("SUPPLYSAFE_SMTP_PASSWORD")
+                       ?? Environment.GetEnvironmentVariable("Smtp__Password")
+                       ?? _configuration["Smtp:Password"];
+
+        if (IsPlaceholderSmtpPassword(smtpPass))
+        {
+            _logger.LogWarning(
+                "SUPPLYSAFE_SMTP_PASSWORD looks like a placeholder, not a real Gmail App Password. Simulating send to {Recipient}.",
+                recipient);
+            smtpPass = null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(host) && !string.IsNullOrWhiteSpace(smtpPass))
         {
             try
             {
-                sentViaSmtp = await TrySendSmtpAsync(host, recipient, subject, body, cancellationToken);
+                sentViaSmtp = await TrySendSmtpAsync(host, recipient, subject, body, smtpUser, smtpPass, cancellationToken);
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "SMTP send failed — simulating email delivery");
             }
+        }
+        else if (!string.IsNullOrWhiteSpace(host) && string.IsNullOrWhiteSpace(smtpPass))
+        {
+            _logger.LogWarning(
+                "SMTP host configured but no password. Set SUPPLYSAFE_SMTP_PASSWORD (Gmail App Password). Simulating send.");
         }
 
         if (!sentViaSmtp)
@@ -149,13 +168,21 @@ public class EmailNotificationService : IEmailNotificationService
         string recipient,
         string subject,
         string body,
+        string? username,
+        string? password,
         CancellationToken cancellationToken)
     {
-        var port = int.TryParse(_configuration["Smtp:Port"], out var p) ? p : 587;
-        var username = _configuration["Smtp:Username"];
-        var password = _configuration["Smtp:Password"];
-        var from = _configuration["Smtp:From"] ?? "alerts@supplysafe.demo";
-        var enableSsl = !string.Equals(_configuration["Smtp:EnableSsl"], "false", StringComparison.OrdinalIgnoreCase);
+        var port = int.TryParse(
+            Environment.GetEnvironmentVariable("Smtp__Port") ?? _configuration["Smtp:Port"],
+            out var p) ? p : 587;
+        var from = Environment.GetEnvironmentVariable("Smtp__From")
+                   ?? _configuration["Smtp:From"]
+                   ?? username
+                   ?? "alerts@supplysafe.demo";
+        var enableSsl = !string.Equals(
+            Environment.GetEnvironmentVariable("Smtp__EnableSsl") ?? _configuration["Smtp:EnableSsl"],
+            "false",
+            StringComparison.OrdinalIgnoreCase);
 
         using var client = new SmtpClient(host, port)
         {
@@ -168,10 +195,35 @@ public class EmailNotificationService : IEmailNotificationService
             client.Credentials = new NetworkCredential(username, password);
         }
 
-        using var message = new MailMessage(from, recipient, subject, body);
+        using var message = new System.Net.Mail.MailMessage(from, recipient, subject, body);
         cancellationToken.ThrowIfCancellationRequested();
         await client.SendMailAsync(message, cancellationToken);
         _logger.LogInformation("SMTP email delivered to {Recipient}", recipient);
         return true;
+    }
+
+    private static string ResolveRecipient(string? requested, string defaultRecipient)
+    {
+        if (string.IsNullOrWhiteSpace(requested))
+            return defaultRecipient;
+
+        var trimmed = requested.Trim();
+        // Legacy demo address should not override configured Ops inbox
+        if (trimmed.Equals("operations@supplysafe.demo", StringComparison.OrdinalIgnoreCase))
+            return defaultRecipient;
+
+        return trimmed;
+    }
+
+    private static bool IsPlaceholderSmtpPassword(string? password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return false;
+
+        var p = password.Trim();
+        return p.Contains("las_16_letras", StringComparison.OrdinalIgnoreCase)
+               || p.Contains("pega_aqui", StringComparison.OrdinalIgnoreCase)
+               || p.Equals("changeme", StringComparison.OrdinalIgnoreCase)
+               || p.Equals("password", StringComparison.OrdinalIgnoreCase);
     }
 }
