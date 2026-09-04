@@ -1,17 +1,17 @@
 <div class="page">
   <header>
-    <h1>Automations</h1>
-    <p>Notify stakeholders when contingency plans fire.</p>
+    <h1>Automatizaciones</h1>
+    <p>Notifica a las partes interesadas cuando se dispara un plan de contingencia.</p>
   </header>
 
   <article class="glass card">
-    <h2>Critical risk email</h2>
+    <h2>Correo de riesgo crítico</h2>
     <p>
-      Subject: <span class="mono">SUPPLYSAFE - Critical Supply Chain Risk</span><br />
-      Recipients: Operations / Procurement
+      Asunto: <span class="mono">SUPPLYSAFE - Riesgo crítico en cadena de suministro</span><br />
+      Destinatarios: Operaciones / Compras
     </p>
     <button type="button" class="btn" [disabled]="sending" (click)="sendDemoEmail()">
-      {{ sending ? 'SENDING…' : 'SEND DEMO EMAIL' }}
+      {{ sending ? 'ENVIANDO…' : 'ENVIAR CORREO DEMO' }}
     </button>
     @if (lastMessage) {
       <p class="result mono">{{ lastMessage }}</p>

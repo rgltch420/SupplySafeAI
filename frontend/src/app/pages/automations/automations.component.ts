@@ -17,18 +17,18 @@ export class AutomationsComponent {
     this.api
       .sendEmail({
         recipient: 'operations@supplysafe.demo',
-        subject: 'SUPPLYSAFE - Critical Supply Chain Risk',
-        body: 'Demo alert: Essential Rice SHP-2048 contingency requires Procurement + Operations review.',
+        subject: 'SUPPLYSAFE - Riesgo crítico en cadena de suministro',
+        body: 'Alerta demo: contingencia de Arroz esencial SHP-2048 requiere revisión de Compras + Operaciones.',
         incidentId: 'INC-2048'
       })
       .subscribe({
         next: (res) => {
           this.sending = false;
-          this.lastMessage = `${res.success ? 'Sent' : 'Failed'} → ${res.recipient} · ${res.subject} · ${res.messageId}`;
+          this.lastMessage = `${res.success ? 'Enviado' : 'Falló'} → ${res.recipient} · ${res.subject} · ${res.messageId}`;
         },
         error: () => {
           this.sending = false;
-          this.lastMessage = 'Email request failed (mock fallback unavailable).';
+          this.lastMessage = 'Falló la solicitud de correo (sin mock disponible).';
         }
       });
   }

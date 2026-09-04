@@ -12,6 +12,7 @@ import {
 } from '../../models/api.models';
 import { ApiService } from '../../services/api.service';
 import { DemoStateService } from '../../services/demo-state.service';
+import { esLabel, esPhrase } from '../../shared/i18n/es-labels';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 
 interface TimelineEvent {
@@ -31,6 +32,7 @@ export class MissionControlComponent implements OnInit {
   private readonly api = inject(ApiService);
   readonly demo = inject(DemoStateService);
   readonly Math = Math;
+  readonly es = esPhrase;
 
   loading = true;
   dashboard: DashboardDto | null = null;
@@ -47,9 +49,9 @@ export class MissionControlComponent implements OnInit {
   emailSent = false;
   busy = false;
   timeline: TimelineEvent[] = [
-    { time: 'T-6h', label: 'Weather signal RSK-WX-01 detected', tone: 'cyan' },
-    { time: 'T-2h', label: 'Incident INC-2048 opened — Essential Rice', tone: 'amber' },
-    { time: 'NOW', label: 'Awaiting disruption simulation', tone: 'red' }
+    { time: 'T-6h', label: 'Señal climática RSK-WX-01 detectada', tone: 'cyan' },
+    { time: 'T-2h', label: 'Incidente INC-2048 abierto — Arroz esencial', tone: 'amber' },
+    { time: 'AHORA', label: 'Esperando simulación de disrupción', tone: 'red' }
   ];
 
   ngOnInit(): void {
@@ -80,6 +82,10 @@ export class MissionControlComponent implements OnInit {
     });
   }
 
+  productName(product: string | null | undefined): string {
+    return esLabel(product) || 'Arroz esencial';
+  }
+
   simulateDisruption(): void {
     if (this.busy) return;
     this.busy = true;
@@ -90,7 +96,7 @@ export class MissionControlComponent implements OnInit {
     this.lossAvoidedVisible = false;
     this.emailSent = false;
 
-    this.pushTimeline('SIM', 'Disruption simulation running…', 'amber');
+    this.pushTimeline('SIM', 'Simulación de disrupción en curso…', 'amber');
 
     this.api.analyzeRisk('SHP-2048').subscribe({
       next: (result) => {
@@ -110,8 +116,8 @@ export class MissionControlComponent implements OnInit {
           };
         }
         this.pushTimeline(
-          'AI',
-          `Risk ${result.riskScore} · ${result.projectedShortageUnits.toLocaleString()} units at risk`,
+          'IA',
+          `Riesgo ${result.riskScore} · ${result.projectedShortageUnits.toLocaleString('es-CO')} unidades en riesgo`,
           'red'
         );
         this.busy = false;
@@ -129,7 +135,7 @@ export class MissionControlComponent implements OnInit {
     this.demo.phase$.next('executing');
     this.tickedActions = [];
     this.lossAvoidedVisible = false;
-    this.pushTimeline('ACT', 'Executing contingency plan…', 'cyan');
+    this.pushTimeline('ACT', 'Ejecutando plan de contingencia…', 'cyan');
 
     this.api.executeContingency('INC-2048').subscribe({
       next: async (result) => {
@@ -138,7 +144,7 @@ export class MissionControlComponent implements OnInit {
 
         for (const action of result.actionsExecuted) {
           await this.delay(380);
-          this.tickedActions = [...this.tickedActions, action];
+          this.tickedActions = [...this.tickedActions, esPhrase(action)];
           this.demo.tickedActions$.next(this.tickedActions);
         }
 
@@ -157,9 +163,9 @@ export class MissionControlComponent implements OnInit {
         this.api
           .sendEmail({
             recipient: 'operations@supplysafe.demo',
-            subject: 'SUPPLYSAFE - Critical Supply Chain Risk',
+            subject: 'SUPPLYSAFE - Riesgo crítico en cadena de suministro',
             body:
-              'Critical Essential Rice delay on SHP-2048. Contingency activated. Notify Operations and Procurement.',
+              'Retraso crítico de Arroz esencial en SHP-2048. Contingencia activada. Notificar a Operaciones y Compras.',
             incidentId: 'INC-2048'
           })
           .subscribe((email) => {
@@ -167,14 +173,14 @@ export class MissionControlComponent implements OnInit {
             this.demo.emailResult$.next(email);
             this.pushTimeline(
               'MAIL',
-              `Email sent → Operations / Procurement · ${email.subject}`,
+              `Correo enviado → Operaciones / Compras · ${email.subject}`,
               'green'
             );
           });
 
         this.pushTimeline(
           'OK',
-          `$${result.estimatedCostAvoided.toLocaleString()} LOSS AVOIDED · ${result.status}`,
+          `$${result.estimatedCostAvoided.toLocaleString('es-CO')} PÉRDIDA EVITADA · ${esLabel(result.status)}`,
           'green'
         );
         this.demo.phase$.next('executed');
@@ -189,7 +195,7 @@ export class MissionControlComponent implements OnInit {
   }
 
   get routeStops(): string[] {
-    return (this.critical?.route ?? 'Shanghai → Cartagena → Barranquilla')
+    return (this.critical?.route ?? 'Shanghái → Cartagena → Barranquilla')
       .split('→')
       .map((s) => s.trim());
   }

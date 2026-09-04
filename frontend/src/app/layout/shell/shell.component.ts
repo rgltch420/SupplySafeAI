@@ -16,23 +16,22 @@ export class ShellComponent implements OnInit {
   readonly api = inject(ApiService);
 
   readonly nav = [
-    { path: '/mission-control', label: 'Mission Control', hint: 'Live threat board' },
-    { path: '/shipments', label: 'Shipments', hint: 'Active cargo' },
-    { path: '/inventory', label: 'Inventory', hint: 'Coverage & stock' },
-    { path: '/risk-intelligence', label: 'Risk Intelligence', hint: 'Signals' },
-    { path: '/incidents', label: 'Incidents', hint: 'Open cases' },
-    { path: '/automations', label: 'Automations', hint: 'Notify & act' }
+    { path: '/mission-control', label: 'Centro de mando', hint: 'Tablero de amenazas' },
+    { path: '/shipments', label: 'Envíos', hint: 'Carga activa' },
+    { path: '/inventory', label: 'Inventario', hint: 'Cobertura y stock' },
+    { path: '/risk-intelligence', label: 'Inteligencia de riesgo', hint: 'Señales' },
+    { path: '/incidents', label: 'Incidentes', hint: 'Casos abiertos' },
+    { path: '/automations', label: 'Automatizaciones', hint: 'Notificar y actuar' }
   ];
 
   readonly title$ = this.router.events.pipe(
     filter((e): e is NavigationEnd => e instanceof NavigationEnd),
     map(() => this.router.url),
     startWith(this.router.url),
-    map((url) => this.nav.find((n) => url.startsWith(n.path))?.label ?? 'Mission Control')
+    map((url) => this.nav.find((n) => url.startsWith(n.path))?.label ?? 'Centro de mando')
   );
 
   ngOnInit(): void {
     this.api.ping().subscribe();
   }
 }
-

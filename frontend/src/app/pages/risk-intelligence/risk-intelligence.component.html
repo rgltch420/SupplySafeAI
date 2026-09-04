@@ -1,7 +1,7 @@
 <div class="page">
   <header>
-    <h1>Risk Intelligence</h1>
-    <p>External and corridor signals feeding the prediction loop.</p>
+    <h1>Inteligencia de riesgo</h1>
+    <p>Señales externas y de corredor que alimentan el ciclo de predicción.</p>
   </header>
 
   <div class="list">
@@ -10,17 +10,17 @@
         <div class="top">
           <div>
             <span class="mono id">{{ risk.id }}</span>
-            <h2>{{ risk.title }}</h2>
+            <h2>{{ es(risk.title) }}</h2>
           </div>
           <div class="badges">
             <app-status-badge [label]="risk.type" />
             <app-status-badge [label]="risk.severity" [value]="risk.score" [showValue]="true" />
           </div>
         </div>
-        <p>{{ risk.description }}</p>
+        <p>{{ es(risk.description) }}</p>
         <div class="meta">
-          <span class="mono">Detected {{ risk.detectedAt | date: 'MMM d, HH:mm' }}</span>
-          <span>Affects: {{ risk.affectedShipments.join(', ') }}</span>
+          <span class="mono">Detectado {{ risk.detectedAt | date: 'd MMM, HH:mm' }}</span>
+          <span>Afecta: {{ risk.affectedShipments.join(', ') }}</span>
         </div>
       </article>
     }
