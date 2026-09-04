@@ -1,5 +1,6 @@
 import { DecimalPipe, NgClass } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { esLabel } from '../../i18n/es-labels';
 
 @Component({
   selector: 'app-status-badge',
@@ -10,7 +11,7 @@ import { Component, Input } from '@angular/core';
       @if (value !== null && value !== undefined && showValue) {
         <span class="mono">{{ value | number: '1.0-0' }}</span>
       }
-      {{ label }}
+      {{ display }}
     </span>
   `,
   styles: `
@@ -70,6 +71,10 @@ export class StatusBadgeComponent {
   @Input({ required: true }) label = '';
   @Input() value: number | null = null;
   @Input() showValue = false;
+
+  get display(): string {
+    return esLabel(this.label);
+  }
 
   get tone(): string {
     return this.label.replace(/\s+/g, '').toLowerCase();

@@ -2,6 +2,7 @@ import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { Shipment } from '../../models/api.models';
 import { ApiService } from '../../services/api.service';
+import { esLabel } from '../../shared/i18n/es-labels';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 
 @Component({
@@ -13,6 +14,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 })
 export class ShipmentsComponent implements OnInit {
   private readonly api = inject(ApiService);
+  readonly label = esLabel;
   shipments: Shipment[] = [];
 
   ngOnInit(): void {
