@@ -1,0 +1,20 @@
+<div class="page">
+  <header>
+    <h1>Automations</h1>
+    <p>Notify stakeholders when contingency plans fire.</p>
+  </header>
+
+  <article class="glass card">
+    <h2>Critical risk email</h2>
+    <p>
+      Subject: <span class="mono">SUPPLYSAFE - Critical Supply Chain Risk</span><br />
+      Recipients: Operations / Procurement
+    </p>
+    <button type="button" class="btn" [disabled]="sending" (click)="sendDemoEmail()">
+      {{ sending ? 'SENDING…' : 'SEND DEMO EMAIL' }}
+    </button>
+    @if (lastMessage) {
+      <p class="result mono">{{ lastMessage }}</p>
+    }
+  </article>
+</div>
