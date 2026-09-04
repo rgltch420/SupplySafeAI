@@ -69,6 +69,28 @@ public class InMemoryStore
         }
     }
 
+    /// <summary>Clears runtime state and reloads burned demo seed (for pitch re-runs).</summary>
+    public void Reset()
+    {
+        lock (_lock)
+        {
+            Shipments.Clear();
+            Inventory.Clear();
+            Risks.Clear();
+            Incidents.Clear();
+            Notifications.Clear();
+            ContingencyPlans.Clear();
+            Orders.Clear();
+            Mailbox.Clear();
+            _incidentSeq = 2049;
+            _messageSeq = 2048;
+            _planSeq = 1000;
+            _orderSeq = 3001;
+            _mailSeq = 100;
+            Seed();
+        }
+    }
+
     private void Seed()
     {
         var now = DateTime.UtcNow;
