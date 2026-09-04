@@ -69,12 +69,16 @@
             <span class="mono danger">{{ impactUnits | number }} units</span>
           </div>
           <div>
-            <span class="label">Estimated loss</span>
+            <span class="label">Estimated loss (USD)</span>
             <span class="mono danger">{{ impactLoss | currency: 'USD':'symbol':'1.0-0' }}</span>
           </div>
           <div>
-            <span class="label">Signal</span>
-            <span class="mono cyan">RSK-WX-01 · Weather · 92</span>
+            <span class="label">{{ analysis?.estimatedFinancialImpactCop ? 'Loss (COP · TRM)' : 'Signal' }}</span>
+            @if (analysis?.estimatedFinancialImpactCop; as cop) {
+              <span class="mono danger">{{ cop | currency: 'COP':'symbol-narrow':'1.0-0' }}</span>
+            } @else {
+              <span class="mono cyan">RSK-WX-01 · Weather · 92</span>
+            }
           </div>
         </div>
       </article>
@@ -113,7 +117,7 @@
 
         @if (emailSent) {
           <div class="email-chip animate-in">
-            Email → Operations / Procurement · SUPPLYSAFE - Critical Supply Chain Risk
+            Email → {{ emailRecipient || 'Operations / Procurement' }} · {{ emailSubject || 'SUPPLYSAFE - Critical Supply Chain Risk' }}
           </div>
         }
       </article>
@@ -212,9 +216,19 @@
           <div class="ai-grid">
             <div><span class="label">Risk</span><span class="mono danger">{{ analysis.riskScore }}</span></div>
             <div><span class="label">Shortage</span><span class="mono">{{ analysis.projectedShortageUnits | number }}</span></div>
-            <div><span class="label">Impact</span><span class="mono">{{ analysis.estimatedFinancialImpact | currency: 'USD':'symbol':'1.0-0' }}</span></div>
-            <div><span class="label">Stockout</span><span class="mono">{{ analysis.predictedStockout ? 'YES' : 'NO' }}</span></div>
+            <div><span class="label">Impact USD</span><span class="mono">{{ analysis.estimatedFinancialImpact | currency: 'USD':'symbol':'1.0-0' }}</span></div>
+            <div>
+              <span class="label">{{ analysis.estimatedFinancialImpactCop ? 'Impact COP' : 'Stockout' }}</span>
+              @if (analysis.estimatedFinancialImpactCop; as cop) {
+                <span class="mono">{{ cop | currency: 'COP':'symbol-narrow':'1.0-0' }}</span>
+              } @else {
+                <span class="mono">{{ analysis.predictedStockout ? 'YES' : 'NO' }}</span>
+              }
+            </div>
           </div>
+          @if (analysis.trmUsdCop) {
+            <p class="route-note">TRM USD→COP: {{ analysis.trmUsdCop | number: '1.2-2' }}</p>
+          }
           <ul class="recs">
             @for (rec of analysis.recommendations; track rec) {
               <li>{{ rec }}</li>

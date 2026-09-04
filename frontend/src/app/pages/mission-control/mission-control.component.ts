@@ -45,6 +45,8 @@ export class MissionControlComponent implements OnInit {
   tickedActions: string[] = [];
   lossAvoidedVisible = false;
   emailSent = false;
+  emailRecipient = '';
+  emailSubject = '';
   busy = false;
   timeline: TimelineEvent[] = [
     { time: 'T-6h', label: 'Weather signal RSK-WX-01 detected', tone: 'cyan' },
@@ -89,6 +91,8 @@ export class MissionControlComponent implements OnInit {
     this.tickedActions = [];
     this.lossAvoidedVisible = false;
     this.emailSent = false;
+    this.emailRecipient = '';
+    this.emailSubject = '';
 
     this.pushTimeline('SIM', 'Disruption simulation running…', 'amber');
 
@@ -156,6 +160,7 @@ export class MissionControlComponent implements OnInit {
 
         this.api
           .sendEmail({
+            // Backend remaps this demo address → Demo:OperationsEmail (Gmail ops)
             recipient: 'operations@supplysafe.demo',
             subject: 'SUPPLYSAFE - Critical Supply Chain Risk',
             body:
@@ -164,10 +169,12 @@ export class MissionControlComponent implements OnInit {
           })
           .subscribe((email) => {
             this.emailSent = email.success;
+            this.emailRecipient = email.recipient;
+            this.emailSubject = email.subject;
             this.demo.emailResult$.next(email);
             this.pushTimeline(
               'MAIL',
-              `Email sent → Operations / Procurement · ${email.subject}`,
+              `Email sent → ${email.recipient} · ${email.subject}`,
               'green'
             );
           });

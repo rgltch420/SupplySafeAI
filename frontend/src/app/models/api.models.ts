@@ -78,6 +78,9 @@ export interface RiskAnalysisResult {
   inventoryCoverageDays: number;
   projectedShortageUnits: number;
   estimatedFinancialImpact: number;
+  /** Backend additive: USD impact × TRM USD→COP */
+  estimatedFinancialImpactCop?: number;
+  trmUsdCop?: number;
   predictedStockout: boolean;
   confidence: number;
   recommendations: string[];
