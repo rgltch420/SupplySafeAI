@@ -113,3 +113,14 @@ curl -X POST http://localhost:5000/api/orders/ORD-3001/process
 # Notificaciones: export SUPPLYSAFE_NOTIFY_EMAIL=tu@correo.com
 # SMTP real (opcional): Smtp__Host, Smtp__Username, Smtp__Password
 ```
+
+## Frontend — Angular (Juan José)
+
+```bash
+cd frontend
+npm install
+ng serve
+```
+
+Abre http://localhost:4200
+
