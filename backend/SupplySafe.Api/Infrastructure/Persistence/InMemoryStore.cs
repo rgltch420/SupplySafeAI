@@ -12,6 +12,8 @@ public class InMemoryStore
     private int _incidentSeq = 2049;
     private int _messageSeq = 2048;
     private int _planSeq = 1000;
+    private int _orderSeq = 3001;
+    private int _mailSeq = 100;
 
     public List<Shipment> Shipments { get; } = [];
     public List<InventoryItem> Inventory { get; } = [];
@@ -19,6 +21,8 @@ public class InMemoryStore
     public List<Incident> Incidents { get; } = [];
     public List<Notification> Notifications { get; } = [];
     public List<ContingencyPlan> ContingencyPlans { get; } = [];
+    public List<WorkOrder> Orders { get; } = [];
+    public List<CorporateEmail> Mailbox { get; } = [];
 
     public InMemoryStore()
     {
@@ -46,6 +50,44 @@ public class InMemoryStore
         lock (_lock)
         {
             return $"PLAN-{_planSeq++}";
+        }
+    }
+
+    public string NextOrderId()
+    {
+        lock (_lock)
+        {
+            return $"ORD-{_orderSeq++}";
+        }
+    }
+
+    public string NextMailId()
+    {
+        lock (_lock)
+        {
+            return $"MAIL-{_mailSeq++}";
+        }
+    }
+
+    /// <summary>Clears runtime state and reloads burned demo seed (for pitch re-runs).</summary>
+    public void Reset()
+    {
+        lock (_lock)
+        {
+            Shipments.Clear();
+            Inventory.Clear();
+            Risks.Clear();
+            Incidents.Clear();
+            Notifications.Clear();
+            ContingencyPlans.Clear();
+            Orders.Clear();
+            Mailbox.Clear();
+            _incidentSeq = 2049;
+            _messageSeq = 2048;
+            _planSeq = 1000;
+            _orderSeq = 3001;
+            _mailSeq = 100;
+            Seed();
         }
     }
 
@@ -268,6 +310,95 @@ public class InMemoryStore
             EstimatedCostAvoided = 84600m,
             Status = ContingencyPlanStatus.Pending,
             ExecutedAt = null
+        });
+
+        // --- Simulated corporate mailbox + burned work orders ---
+        Mailbox.Add(new CorporateEmail
+        {
+            Id = "MAIL-001",
+            Direction = MailDirection.Inbound,
+            From = "compras@almacenespacifico.com",
+            To = "orders@supplysafe.demo",
+            Subject = "PO-77821 — Urgent replenishment Essential Rice 15,000 units — Barranquilla DC",
+            Body =
+                """
+                Hello SupplySafe Ops,
+
+                Please process purchase order PO-77821.
+                Product: Essential Rice
+                Quantity: 15000
+                Destination: Barranquilla
+                Required by: next week
+                Linked preferred lane: Shanghai → Cartagena → Barranquilla
+
+                Regards,
+                Procurement — Almacenes Pacífico
+                """,
+            ReceivedAt = now.AddHours(-5),
+            Processed = true,
+            LinkedOrderId = "ORD-3000"
+        });
+
+        Mailbox.Add(new CorporateEmail
+        {
+            Id = "MAIL-002",
+            Direction = MailDirection.Inbound,
+            From = "ops@clinicacaribe.org",
+            To = "orders@supplysafe.demo",
+            Subject = "PO-77910 — Medical Supplies Kit restock Cartagena",
+            Body =
+                """
+                Requesting Medical Supplies Kit x 2,000 units for Cartagena warehouse.
+                Reference: PO-77910
+                """,
+            ReceivedAt = now.AddHours(-3),
+            Processed = false,
+            LinkedOrderId = null
+        });
+
+        Orders.Add(new WorkOrder
+        {
+            Id = "ORD-3000",
+            ExternalReference = "PO-77821",
+            Customer = "Almacenes Pacífico",
+            Product = "Essential Rice",
+            RequestedUnits = 15000,
+            Destination = "Barranquilla",
+            Status = OrderStatus.AtRisk,
+            SourceEmailId = "MAIL-001",
+            LinkedShipmentId = "SHP-2048",
+            LinkedIncidentId = "INC-2048",
+            CreatedAt = now.AddHours(-5),
+            Timeline =
+            [
+                "[T+0] Email received from compras@almacenespacifico.com",
+                "[T+1m] Order ORD-3000 created from PO-77821",
+                "[T+3m] Linked to shipment SHP-2048 (Essential Rice)",
+                "[T+5m] Risk engine flagged CRITICAL (score 87) — weather delay +6 days",
+                "[T+6m] Incident INC-2048 opened — awaiting contingency activation"
+            ]
+        });
+
+        Orders.Add(new WorkOrder
+        {
+            Id = "ORD-2990",
+            ExternalReference = "PO-77002",
+            Customer = "Distribuidora Norte",
+            Product = "Coffee Packaging Film",
+            RequestedUnits = 5000,
+            Destination = "Barranquilla",
+            Status = OrderStatus.Completed,
+            SourceEmailId = null,
+            LinkedShipmentId = "SHP-1760",
+            LinkedIncidentId = null,
+            CreatedAt = now.AddDays(-2),
+            ProcessedAt = now.AddDays(-1),
+            Timeline =
+            [
+                "[T+0] Order received via EDI bridge",
+                "[T+10m] Linked to healthy shipment SHP-1760",
+                "[T+1d] Fulfilled — no contingency required"
+            ]
         });
     }
 }

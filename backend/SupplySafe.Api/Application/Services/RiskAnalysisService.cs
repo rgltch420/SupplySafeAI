@@ -1,7 +1,5 @@
 using SupplySafe.Api.Application.DTOs;
 using SupplySafe.Api.Application.Interfaces;
-using SupplySafe.Api.Domain.Entities;
-using SupplySafe.Api.Domain.Enums;
 using SupplySafe.Api.Infrastructure.Persistence;
 
 namespace SupplySafe.Api.Application.Services;
@@ -11,15 +9,18 @@ public class RiskAnalysisService
     private readonly InMemoryStore _store;
     private readonly IAiRiskAnalyzer _aiRiskAnalyzer;
     private readonly ISupplyRiskEngine _riskEngine;
+    private readonly ITrmFxService _trmFxService;
 
     public RiskAnalysisService(
         InMemoryStore store,
         IAiRiskAnalyzer aiRiskAnalyzer,
-        ISupplyRiskEngine riskEngine)
+        ISupplyRiskEngine riskEngine,
+        ITrmFxService trmFxService)
     {
         _store = store;
         _aiRiskAnalyzer = aiRiskAnalyzer;
         _riskEngine = riskEngine;
+        _trmFxService = trmFxService;
     }
 
     public async Task<RiskAnalysisResultDto?> AnalyzeAsync(
@@ -40,6 +41,11 @@ public class RiskAnalysisService
             .ToList();
 
         var result = await _aiRiskAnalyzer.AnalyzeAsync(shipment, inventory, relatedRisks, cancellationToken);
+
+        // Convert USD impact → COP using TRM basket (official concept = USD/COP)
+        var fx = await _trmFxService.GetSnapshotAsync(cancellationToken);
+        result.TrmUsdCop = fx.UsdCop;
+        result.EstimatedFinancialImpactCop = _trmFxService.ToCop(result.EstimatedFinancialImpact, fx);
 
         // Keep store in sync for dashboard / execute flow
         shipment.RiskScore = result.RiskScore;
